@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import Sidebar from './components/Sidebar';
+import Editor from './components/Editor';
+import './styles/App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [writings, setWritings] = useState([]);
+  const [activeWriting, setActiveWriting] = useState(null);
+
+  const handleAddWriting = () => {
+    const newWriting = { id: Date.now(), title: '', content: '' };
+    setWritings([...writings, newWriting]);
+    setActiveWriting(newWriting.id);
+  };
+
+  const handleDeleteWriting = (id) => {
+    setWritings(writings.filter((writing) => writing.id !== id));
+    if (activeWriting === id) setActiveWriting(null);
+  };
+
+  const handleUpdateWriting = (id, updatedWriting) => {
+    setWritings(
+      writings.map((writing) =>
+        writing.id === id ? updatedWriting : writing
+      )
+    );
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app">
+      <Sidebar
+        writings={writings}
+        activeWriting={activeWriting}
+        onAddWriting={handleAddWriting}
+        onDeleteWriting={handleDeleteWriting}
+        onSetActiveWriting={setActiveWriting}
+      />
+      <Editor
+        activeWriting={writings.find((w) => w.id === activeWriting)}
+        onUpdateWriting={handleUpdateWriting}
+      />
+    </div>
+  );
+};
 
-export default App
+export default App;
